@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Phần mềm kê hồ sơ hình sự</title>
+<style>
+:root{
+  --ink:#1b2a3a;
+  --ink-soft:#4a5a6a;
+  --paper:#fbfaf6;
+  --paper-2:#ffffff;
+  --line:#d8d3c4;
+  --line-strong:#b7ae95;
+  --accent:#7a3b2e;
+  --accent-2:#8f6b1f;
+  --green:#2f5d3a;
+  --green-bg:#e7efe4;
+  --red:#8a2c2c;
+  --red-bg:#f6e6e3;
+  --amber-bg:#f8f0da;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:"Segoe UI",Arial,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+}
+.app{max-width:1180px;margin:0 auto;padding:22px 20px 80px;}
+h1{font-size:20px;font-weight:700;margin:0 0 2px;letter-spacing:.2px;}
+.subtitle{color:var(--ink-soft);font-size:13px;margin:0 0 20px;}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px;}
+button{
+  font-family:inherit;font-size:13px;border:1px solid var(--line-strong);
+  background:var(--paper-2);color:var(--ink);padding:8px 14px;border-radius:5px;
+  cursor:pointer;transition:.12s;
+}
+button:hover{background:#f2efe4;border-color:var(--accent);}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.primary:hover{background:#622f24;}
+button.ghost{background:transparent;border-color:transparent;color:var(--accent);padding:6px 8px;}
+button.ghost:hover{background:#efe8da;}
+button.danger{color:var(--red);}
+button.danger:hover{background:var(--red-bg);border-color:var(--red);}
+button:disabled{opacity:.4;cursor:not-allowed;}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  font-family:inherit;font-size:13px;border:1px solid var(--line-strong);
+  border-radius:5px;padding:7px 9px;background:#fff;color:var(--ink);
+}
+input:focus,select:focus,textarea:focus{outline:2px solid #c9a24a;outline-offset:0;}
+.card{background:var(--paper-2);border:1px solid var(--line);border-radius:8px;padding:16px 18px;margin-bottom:16px;}
+.hidden{display:none !important;}
+table.list{width:100%;border-collapse:collapse;font-size:13px;}
+table.list th{text-align:left;font-weight:600;color:var(--ink-soft);border-bottom:2px solid var(--line-strong);padding:8px 6px;font-size:12px;text-transform:uppercase;letter-spacing:.3px;}
+table.list td{border-bottom:1px solid var(--line);padding:9px 6px;vertical-align:top;}
+table.list tr:hover td{background:#faf7ee;}
+.badge{display:inline-block;font-size:11px;padding:2px 7px;border-radius:10px;margin:1px 3px 1px 0;}
+.badge.similar{background:var(--amber-bg);color:var(--accent-2);border:1px solid #d9c37a;}
+.badge.count{background:#eee9d8;color:var(--ink-soft);}
+.name-cell{font-weight:600;}
+.empty{text-align:center;color:var(--ink-soft);padding:40px 10px;font-size:13px;}
+.field-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.3px;}
+.field input{min-width:200px;}
+table.doc{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px;}
+table.doc th,table.doc td{border:1px solid #8a8368;padding:6px 7px;text-align:center;vertical-align:middle;}
+table.doc thead th{background:#efe9d5;font-weight:700;font-size:11.5px;}
+table.doc td.txt{text-align:left;}
+table.doc textarea{width:100%;border:none;background:transparent;resize:vertical;font-family:inherit;font-size:12.5px;padding:2px;min-height:34px;}
+table.doc textarea:focus{outline:1px solid var(--accent-2);background:#fffdf3;}
+.row-actions{display:flex;gap:3px;justify-content:center;}
+.row-actions button{padding:3px 6px;font-size:11px;}
+.stt-cell{font-weight:600;color:var(--ink-soft);width:34px;}
+.toso-cell{width:78px;font-weight:600;}
+.count-input{width:44px;padding:4px;text-align:center;}
+.footerbar{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:12px;border-top:1px dashed var(--line-strong);font-size:13px;flex-wrap:wrap;gap:10px;}
+.total{font-weight:600;}
+.modal-overlay{position:fixed;inset:0;background:rgba(30,25,15,.45);display:flex;align-items:flex-start;justify-content:center;z-index:50;padding:40px 16px;overflow:auto;}
+.modal{background:#fff;border-radius:10px;max-width:720px;width:100%;padding:20px 22px;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.modal h2{font-size:16px;margin:0 0 12px;}
+.cat-block{margin-bottom:14px;}
+.cat-title{font-weight:700;font-size:12.5px;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;border-bottom:1px solid var(--line);padding-bottom:3px;}
+.item-line{display:flex;align-items:flex-start;gap:8px;padding:3px 2px;font-size:13px;border-radius:4px;}
+.item-line:hover{background:#f5f1e4;}
+.item-line input{margin-top:3px;}
+.modal-actions{display:flex;justify-content:space-between;gap:10px;margin-top:16px;border-top:1px solid var(--line);padding-top:12px;flex-wrap:wrap;}
+.search-box{width:100%;margin-bottom:12px;}
+.compare-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.compare-col h3{font-size:13px;margin:0 0 8px;}
+.match-yes{background:var(--green-bg);}
+.match-no{background:var(--red-bg);}
+.legend{font-size:12px;color:var(--ink-soft);margin-bottom:10px;}
+.legend span{display:inline-block;width:12px;height:12px;border-radius:2px;margin-right:4px;vertical-align:-1px;}
+.print-only{display:none;}
+.checkbox-row{display:flex;align-items:center;gap:6px;}
+.small-note{font-size:11.5px;color:var(--ink-soft);}
+.tag-toggle{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--ink-soft);}
+@media print{
+  body *{visibility:hidden;}
+  .print-only, .print-only *{visibility:visible;}
+  .print-only{display:block;position:absolute;left:0;top:0;width:100%;}
+  .print-case{page-break-after:always;padding:20px 30px;font-family:"Times New Roman",serif;}
+  .print-case:last-child{page-break-after:auto;}
+  .print-case h2{text-align:center;font-size:15px;letter-spacing:1px;margin:4px 0 14px;}
+  .print-case table{width:100%;border-collapse:collapse;font-size:12px;}
+  .print-case th,.print-case td{border:1px solid #000;padding:4px 6px;}
+  .print-case thead th{font-weight:700;text-align:center;}
+  .print-foot{margin-top:16px;font-size:13px;}
+  .print-foot .sig{text-align:right;margin-top:6px;font-weight:700;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <h1>Phần mềm kê hồ sơ hình sự</h1>
+  <p class="subtitle">Mục lục tài liệu văn kiện — tạo, lưu, đối chiếu và in hàng loạt theo mẫu Viện kiểm sát</p>
+
+  <div id="view-list">
+    <div class="toolbar">
+      <button class="primary" id="btn-new-case"><b>+</b> Tạo hồ sơ mới</button>
+      <button id="btn-preview-selected" disabled>Xem trước</button>
+      <button id="btn-export-selected" disabled>Xuất file (.doc)</button>
+      <button id="btn-batch-print" disabled>In hàng loạt hồ sơ đã chọn</button>
+      <button id="btn-compare" disabled>So sánh / đối chiếu hồ sơ đã chọn</button>
+      <button id="btn-export">Xuất dữ liệu (.json)</button>
+      <button id="btn-import">Nhập dữ liệu (.json)</button>
+      <input type="file" id="import-file-input" accept=".json" class="hidden">
+      <span style="flex:1"></span>
+      <input type="text" id="search-cases" placeholder="Tìm theo tên bị can..." style="min-width:220px;">
+    </div>
+    <div class="card">
+      <table class="list" id="table-cases">
+        <thead>
+          <tr>
+            <th style="width:26px;"><input type="checkbox" id="check-all"></th>
+            <th>Tên bị can / vụ án</th>
+            <th>Ngày lập hồ sơ</th>
+            <th>Số dòng mục</th>
+            <th>Tổng số tờ</th>
+            <th>Đối chiếu</th>
+            <th style="width:190px;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty hidden" id="empty-msg">Chưa có hồ sơ nào. Bấm "Tạo hồ sơ mới" để bắt đầu.</div>
+    </div>
+  </div>
+
+  <div id="view-editor" class="hidden">
+    <div class="toolbar">
+      <button class="ghost" id="btn-back">&larr; Quay lại danh sách</button>
+      <span style="flex:1"></span>
+      <button id="btn-preview-one">Xem trước</button>
+      <button id="btn-export-one">Xuất file (.doc)</button>
+      <button id="btn-print-one">In hồ sơ này</button>
+      <button class="primary" id="btn-save-case">Lưu hồ sơ</button>
+    </div>
+    <div class="card">
+      <div class="field-row">
+        <div class="field">
+          <label>Tên bị can / vụ án</label>
+          <input type="text" id="f-defendant" placeholder="VD: Nguyễn Văn A" style="min-width:260px;">
+        </div>
+        <div class="field">
+          <label>Ngày lập hồ sơ</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field">
+          <label>Người lập hồ sơ</label>
+          <input type="text" id="f-preparer" placeholder="Họ tên" style="min-width:200px;">
+        </div>
+        <div class="field">
+          <label>Cơ quan lập văn kiện (mặc định)</label>
+          <input type="text" id="f-agency" placeholder="VD: CQĐT Công an tỉnh Cà Mau" style="min-width:240px;">
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom:6px;">
+        <button class="primary" id="btn-add-item">+ Thêm mục từ danh mục chuẩn</button>
+        <button id="btn-add-custom">+ Thêm dòng trống (tự nhập)</button>
+        <span style="flex:1"></span>
+        <span class="small-note">Tờ số tự tính theo số tờ mỗi mục — có thể sửa tay khi cần (VD 12-15, hoặc 12,14,16).</span>
+      </div>
+
+      <table class="doc">
+        <thead>
+          <tr>
+            <th style="width:34px;">STT</th>
+            <th>Tên, loại và trích yếu văn kiện</th>
+            <th style="width:80px;">Số tờ</th>
+            <th style="width:90px;">Tờ số</th>
+            <th style="width:130px;">Ghi chú</th>
+            <th style="width:96px;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="rows-body"></tbody>
+      </table>
+
+      <div class="footerbar">
+        <div class="total">Tổng số tờ: <span id="total-pages">0</span></div>
+        <div class="small-note">Số dòng mục: <span id="total-rows">0</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay hidden" id="picker-overlay">
+  <div class="modal">
+    <h2>Chọn văn kiện từ danh mục chuẩn</h2>
+    <input type="text" class="search-box" id="picker-search" placeholder="Tìm nhanh loại văn kiện...">
+    <div class="tag-toggle" style="margin-bottom:10px;justify-content:space-between;display:flex;">
+      <label><input type="checkbox" id="merge-toggle"> Gộp tất cả mục đã chọn vào 1 dòng (phân cách bởi dấu ;)</label>
+      <span style="display:flex;gap:6px;">
+        <button class="ghost" id="btn-clean-duplicates" style="font-size:11px;padding:4px 8px;" title="Xóa các mục tự thêm đã có sẵn trong danh mục chuẩn">Dọn mục trùng</button>
+        <button class="ghost danger" id="btn-clear-custom" style="font-size:11px;padding:4px 8px;" title="Xóa toàn bộ mục tự thêm">Xóa hết mục tự thêm</button>
+      </span>
+    </div>
+    <div id="picker-body" style="max-height:420px;overflow:auto;"></div>
+    <div style="margin-top:12px;">
+      <div class="field-row">
+        <div class="field" style="flex:1;">
+          <label>Thêm nhanh mục tự nhập (không có trong danh mục)</label>
+          <input type="text" id="custom-item-input" placeholder="Nhập tên văn kiện rồi bấm Thêm vào danh mục" style="min-width:100%;width:100%;">
+        </div>
+        <button id="btn-add-to-catalog" style="align-self:flex-end;">Thêm vào danh mục</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="ghost" id="picker-cancel">Hủy</button>
+      <button class="primary" id="picker-confirm">Thêm mục đã chọn vào hồ sơ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="compare-overlay">
+  <div class="modal" style="max-width:900px;">
+    <h2>Đối chiếu hồ sơ</h2>
+    <div class="legend"><span style="background:var(--green-bg);"></span>Trùng nội dung &nbsp;&nbsp;<span style="background:var(--red-bg);"></span>Chỉ có ở 1 hồ sơ</div>
+    <div id="compare-body" class="compare-wrap"></div>
+    <div class="modal-actions">
+      <button class="ghost" id="compare-close">Đóng</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay hidden" id="preview-overlay">
+  <div class="modal" style="max-width:840px;">
+    <h2>Xem trước hồ sơ</h2>
+    <div id="preview-content" style="max-height:60vh;overflow:auto;border:1px solid var(--line);padding:16px 20px;background:#fff;"></div>
+    <div class="modal-actions">
+      <button class="ghost" id="preview-close">Đóng</button>
+      <div style="display:flex;gap:8px;">
+        <button id="preview-export-doc">Xuất file (.doc)</button>
+        <button class="primary" id="preview-print">In</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay hidden" id="confirm-overlay">
+  <div class="modal" style="max-width:400px;">
+    <p id="confirm-message" style="font-size:14px;margin:0 0 18px;line-height:1.5;"></p>
+    <div class="modal-actions" style="justify-content:flex-end;border-top:none;padding-top:0;">
+      <button class="ghost" id="confirm-cancel">Hủy</button>
+      <button class="danger" id="confirm-ok" style="border-color:var(--red);">Đồng ý</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="hidden" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#2a2a26;color:#fff;padding:11px 20px;border-radius:7px;font-size:13px;z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.3);max-width:520px;text-align:center;"></div>
+<div class="print-only" id="print-root"></div>
+
+<script>
+const CATALOG = [
+["Tiếp nhận, giải quyết tố giác, tin báo tội phạm",[
+ "Quyết định khởi tố vụ án",
+ "Phiếu chuyển nguồn tin tội phạm",
+ "Thông báo tiếp nhận tố giác, tin báo về tội phạm",
+ "Biên bản tiếp nhận nguồn tin tội phạm",
+ "Quyết định phân công Thủ trưởng, Điều tra viên, Cán bộ điều tra",
+ "Quyết định phân công Kiểm sát viên",
+ "Đề nghị gia hạn giải quyết nguồn tin",
+ "Quyết định gia hạn giải quyết nguồn tin",
+ "Báo cáo kết thúc giải quyết nguồn tin",
+ "Thông báo kết quả giải quyết nguồn tin",
+ "Báo cáo việc thụ lý kiểm sát đối với tin báo, tố giác, kiến nghị khởi tố",
+ "Yêu cầu kiểm tra, xác minh nguồn tin về tội phạm",
+ "Báo cáo đề xuất án mới khởi tố"
+]],
+["Bắt, tạm giữ, tạm giam, biện pháp ngăn chặn",[
+ "Lệnh giữ người trong trường hợp khẩn cấp",
+ "Lệnh bắt người bị giữ trong trường hợp khẩn cấp",
+ "Biên bản giữ người, bắt người bị giữ trong trường hợp khẩn cấp",
+ "Thông báo bắt người phạm tội quả tang",
+ "Biên bản bắt người phạm tội quả tang",
+ "Quyết định tạm giữ",
+ "Đề nghị phê chuẩn Lệnh bắt người bị giữ trong trường hợp khẩn cấp",
+ "Quyết định phê chuẩn Lệnh bắt người bị giữ trong trường hợp khẩn cấp",
+ "Thông báo tạm giữ, bắt, giữ người trong trường hợp khẩn cấp",
+ "Quyết định gia hạn tạm giữ",
+ "Đề nghị phê chuẩn Quyết định gia hạn tạm giữ",
+ "Quyết định phê chuẩn Quyết định gia hạn tạm giữ",
+ "Lệnh tạm giam",
+ "Đề nghị lệnh tạm giam",
+ "Quyết định phê chuẩn Lệnh tạm giam",
+ "Đề nghị phê chuẩn Lệnh tạm giam",
+ "Thông báo áp dụng lệnh tạm giam",
+ "Lệnh cấm đi khỏi nơi cư trú",
+ "Thông báo về việc áp dụng biện pháp cấm đi khỏi nơi cư trú",
+ "Quyết định tạm hoãn xuất cảnh",
+ "Thông báo về việc áp dụng biện pháp tạm hoãn xuất cảnh",
+ "Quyết định trả tự do",
+ "Quyết định chuyển người bị tạm giữ",
+ "Quyết định chuyển vụ án"
+]],
+["Khởi tố bị can, điều tra",[
+ "Quyết định khởi tố bị can",
+ "Đề nghị khởi tố bị can",
+ "Quyết định phê chuẩn Quyết định khởi tố bị can",
+ "Đề nghị phê chuẩn Quyết định khởi tố bị can",
+ "Quyết định phân công Điều tra viên, Cán bộ điều tra (điều tra vụ án)",
+ "Quyết định phân công Kiểm sát viên (yêu cầu điều tra)",
+ "Yêu cầu điều tra",
+ "Kế hoạch thực hành quyền công tố, kiểm sát điều tra",
+ "Sơ đồ tư duy",
+ "Quyết định trưng cầu giám định",
+ "Thông báo kết luận giám định",
+ "Kết luận giám định",
+ "Yêu cầu định giá tài sản",
+ "Thông báo về nội dung kết luận định giá tài sản",
+ "Kết luận định giá tài sản",
+ "Quyết định gia hạn điều tra",
+ "Đề nghị gia hạn điều tra",
+ "Quyết định trả hồ sơ điều tra bổ sung",
+ "Quyết định tách vụ án",
+ "Quyết định nhập vụ án",
+ "Quyết định truy nã",
+ "Quyết định truy tìm người",
+ "Quyết định ủy thác điều tra",
+ "Yêu cầu cơ quan, tổ chức, cá nhân cung cấp chứng cứ, tài liệu, đồ vật",
+ "Lệnh nhập kho vật chứng, Phiếu nhập kho vật chứng",
+ "Lệnh xuất kho vật chứng, Phiếu xuất kho vật chứng",
+ "Quyết định xử lý vật chứng, tài sản",
+ "Quyết định chuyển vật chứng",
+ "Quyết định tạm đình chỉ điều tra bị can",
+ "Thông báo kết thúc điều tra",
+ "Thông báo về việc kết thúc điều tra vụ án hình sự"
+]],
+["Biên bản, tài liệu điều tra",[
+ "Biên bản khám nghiệm hiện trường, kiểm tra nơi xảy ra vụ việc, sơ đồ",
+ "Biên bản xem dấu vết trên thân thể",
+ "Biên bản xác định trọng lượng, giá trị tài sản; Bản kết luận định giá tài sản",
+ "Biên bản niêm phong, mở niêm phong đồ vật, tài liệu",
+ "Biên bản giao nhận",
+ "Biên bản làm việc",
+ "Biên bản xác minh",
+ "Biên bản đối chất",
+ "Biên bản nhận dạng",
+ "Thông báo nhận dạng",
+ "Bản tự khai",
+ "Tờ tự nhận",
+ "Tờ cam kết",
+ "Biên bản ghi lời khai",
+ "Biên bản hỏi cung bị can",
+ "Thông báo hỏi cung bị can",
+ "Thông báo tiến hành hỏi cung bị can",
+ "Biên bản đóng gói, mở niêm phong đối tượng giám định",
+ "Bản ảnh",
+ "Danh bản, chỉ bản",
+ "Yêu cầu tra cứu; Thông báo trả lời yêu cầu tra cứu",
+ "Thông báo kết quả tra cứu",
+ "Trích lục tiền án, tiền sự",
+ "Hồ sơ tiền án, tiền sự (Quyết định xử phạt vi phạm hành chính, bản án, giấy xác nhận thi hành án,...)",
+ "Lý lịch cá nhân",
+ "Lý lịch bị can",
+ "Giấy khai sinh",
+ "Hồ sơ người có công với cách mạng (Giấy chứng nhận liệt sĩ, bằng Tổ quốc ghi công, huân chương kháng chiến,...)",
+ "Giấy cam đoan",
+ "Thủ tục trợ giúp pháp lý",
+ "Quyết định xử phạt vi phạm hành chính",
+ "Hồ sơ xử phạt hành chính",
+ "Biên bản vi phạm hành chính",
+ "Biên bản tịch thu tang vật, phương tiện vi phạm hành chính",
+ "Biên bản trả lại tang vật, phương tiện vi phạm hành chính",
+ "Biên lai đóng tiền phạt vi phạm hành chính",
+ "Đơn xin giảm nhẹ hình phạt",
+ "Văn bản trả lời kiến nghị"
+]],
+["Kết thúc điều tra, đề nghị truy tố",[
+ "Biên bản họp đánh giá tài liệu, chứng cứ",
+ "Bản kết luận điều tra vụ án hình sự đề nghị truy tố",
+ "Báo cáo đề xuất",
+ "Biên bản giao nhận hồ sơ, vật chứng"
+]],
+["Truy tố",[
+ "Thông báo truy tố",
+ "Quyết định phân công Kiểm sát viên thực hành quyền công tố và kiểm sát xét xử",
+ "Quyết định gia hạn truy tố",
+ "Cáo trạng"
+]],
+["Xét xử",[
+ "Quyết định phân công Hội đồng xét xử",
+ "Quyết định đưa vụ án ra xét xử",
+ "Quyết định hoãn phiên tòa",
+ "Thông báo dời/hoãn phiên tòa",
+ "Báo cáo kết quả nghiên cứu vụ án",
+ "Đề cương xét hỏi",
+ "Bản luận tội",
+ "Bản cứu án",
+ "Tóm tắt diễn biến phiên tòa",
+ "Biên bản kiểm tra",
+ "Bản án hình sự",
+ "Phiếu kiểm sát",
+ "Báo cáo kết quả THQCT, KSXXST",
+ "Báo cáo (bảo lưu) quan điểm khác",
+ "Thông báo kháng cáo"
+]],
+["Báo cáo nghiệp vụ của Viện kiểm sát",[
+ "Báo cáo đề xuất phê chuẩn Quyết định khởi tố bị can",
+ "Báo cáo đề xuất tạm giữ",
+ "Báo cáo đề xuất phê chuẩn Lệnh tạm giam",
+ "Báo cáo đề xuất gia hạn tạm giữ",
+ "Báo cáo đề xuất gia hạn tạm giam",
+ "Báo cáo đề xuất gia hạn điều tra vụ án",
+ "Báo cáo đề xuất gia hạn truy tố",
+ "Báo cáo đề xuất trả hồ sơ điều tra bổ sung",
+ "Báo cáo đề xuất tạm đình chỉ điều tra",
+ "Báo cáo đề xuất đình chỉ điều tra",
+ "Báo cáo đề xuất phê chuẩn các quyết định tố tụng khác",
+ "Báo cáo án truy tố",
+ "Báo cáo án xét xử",
+ "Báo cáo thỉnh thị án",
+ "Báo cáo án trọng điểm, án dư luận xã hội quan tâm",
+ "Báo cáo vi phạm, kiến nghị khắc phục vi phạm",
+ "Báo cáo kết quả kiểm sát việc giải quyết nguồn tin tội phạm",
+ "Báo cáo tổng hợp kết quả thực hành quyền công tố và kiểm sát điều tra",
+ "Báo cáo thỉnh thị nghiệp vụ",
+ "Báo cáo kết quả kiểm sát việc bắt, tạm giữ, tạm giam",
+ "Báo cáo áp dụng, thay đổi, hủy bỏ các biện pháp ngăn chặn trong giai đoạn truy tố hoặc gia hạn thời hạn quyết định truy tố"
+]]
+];
+
+let customCatalog = [];
+let cases = {};
+let currentCaseId = null;
+let currentRows = [];
+let pickerSelection = new Set();
+let compareSelection = [];
+let storageWarned = false;
+
+function uid(){return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+let toastTimer=null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.add('hidden'), 3200);
+}
+let confirmResolve = null;
+function showConfirm(message){
+  return new Promise(resolve=>{
+    confirmResolve = resolve;
+    document.getElementById('confirm-message').textContent = message;
+    document.getElementById('confirm-overlay').classList.remove('hidden');
+  });
+}
+document.getElementById('confirm-ok').addEventListener('click', ()=>{
+  document.getElementById('confirm-overlay').classList.add('hidden');
+  if(confirmResolve){ confirmResolve(true); confirmResolve=null; }
+});
+document.getElementById('confirm-cancel').addEventListener('click', ()=>{
+  document.getElementById('confirm-overlay').classList.add('hidden');
+  if(confirmResolve){ confirmResolve(false); confirmResolve=null; }
+});
+
+const LS_PREFIX = 'kehoso_v1:';
+function storageOK(){
+  try{
+    const t='__test__'+Date.now();
+    localStorage.setItem(t,'1'); localStorage.removeItem(t);
+    return true;
+  }catch(e){ return false; }
+}
+function lsGet(key){
+  try{ return localStorage.getItem(LS_PREFIX+key); }catch(e){ return null; }
+}
+function lsSet(key,val){
+  try{ localStorage.setItem(LS_PREFIX+key,val); return true; }
+  catch(e){ warnStorage(); return false; }
+}
+function lsDelete(key){
+  try{ localStorage.removeItem(LS_PREFIX+key); }catch(e){}
+}
+function lsListKeys(prefix){
+  const out=[];
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k = localStorage.key(i);
+      if(k && k.indexOf(LS_PREFIX+prefix)===0) out.push(k.slice(LS_PREFIX.length));
+    }
+  }catch(e){}
+  return out;
+}
+function warnStorage(){
+  if(storageWarned) return;
+  storageWarned = true;
+  showToast('Trình duyệt đang chặn lưu trữ cục bộ (localStorage). Dữ liệu sẽ chỉ tồn tại trong phiên làm việc này. Hãy dùng nút "Xuất dữ liệu (.json)" thường xuyên để sao lưu.');
+}
+
+async function loadCustomCatalog(){
+  try{
+    const v = lsGet('custom-catalog');
+    if(v) customCatalog = JSON.parse(v);
+  }catch(e){ customCatalog = []; }
+}
+async function saveCustomCatalog(){
+  lsSet('custom-catalog', JSON.stringify(customCatalog));
+}
+
+async function loadAllCases(){
+  cases = {};
+  const keys = lsListKeys('case:');
+  keys.forEach(k=>{
+    try{
+      const v = lsGet(k);
+      if(v){ const obj = JSON.parse(v); cases[obj.id]=obj; }
+    }catch(e){}
+  });
+}
+async function saveCase(obj){
+  lsSet('case:'+obj.id, JSON.stringify(obj));
+  cases[obj.id] = obj;
+}
+async function deleteCaseStorage(id){
+  lsDelete('case:'+id);
+  delete cases[id];
+}
+function exportAllData(){
+  const payload = {exportedAt:new Date().toISOString(), customCatalog, cases: Object.values(cases)};
+  const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ke-ho-so-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+async function importAllData(file){
+  try{
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    if(Array.isArray(payload.cases)){
+      for(const c of payload.cases){
+        if(!c.id) c.id = uid();
+        await saveCase(c);
+      }
+    }
+    if(Array.isArray(payload.customCatalog)){
+      payload.customCatalog.forEach(it=>{ if(!customCatalog.includes(it)) customCatalog.push(it); });
+      await saveCustomCatalog();
+    }
+    renderCaseList();
+    showToast('Đã nhập dữ liệu thành công.');
+  }catch(e){
+    showToast('Không đọc được file sao lưu. Vui lòng kiểm tra lại file .json.');
+  }
+}
+
+function parseRangeEnd(text){
+  if(!text) return 0;
+  const nums = String(text).match(/\d+/g);
+  if(!nums) return 0;
+  return parseInt(nums[nums.length-1],10);
+}
+
+function computeToSo(rows){
+  let cursor = 0;
+  for(const row of rows){
+    if(row.customToSo && row.toSoText){ cursor = Math.max(cursor, parseRangeEnd(row.toSoText)); continue; }
+    const count = Math.max(1, parseInt(row.pageCount,10)||1);
+    const start = cursor+1;
+    const end = start+count-1;
+    row.toSoText = count>1 ? (start+'-'+end) : String(start);
+    cursor = end;
+  }
+  return cursor;
+}
+
+function contentSet(caseObj){
+  const set = new Set();
+  (caseObj.rows||[]).forEach(r=>{
+    (r.content||'').split(';').map(s=>s.trim().toLowerCase()).filter(Boolean).forEach(x=>set.add(x));
+  });
+  return set;
+}
+function jaccard(a,b){
+  if(a.size===0 && b.size===0) return 0;
+  let inter=0;
+  a.forEach(x=>{ if(b.has(x)) inter++; });
+  const union = new Set([...a,...b]).size;
+  return union===0?0:inter/union;
+}
+
+function renderCaseList(){
+  const tbody = document.querySelector('#table-cases tbody');
+  tbody.innerHTML='';
+  const searchVal = document.getElementById('search-cases').value.trim().toLowerCase();
+  const arr = Object.values(cases).sort((a,b)=> (b.updatedAt||0)-(a.updatedAt||0));
+  const filtered = arr.filter(c=> !searchVal || (c.defendant||'').toLowerCase().includes(searchVal));
+  document.getElementById('empty-msg').classList.toggle('hidden', arr.length>0);
+
+  const sims = {};
+  arr.forEach(c=> sims[c.id]=[]);
+  for(let i=0;i<arr.length;i++){
+    for(let j=i+1;j<arr.length;j++){
+      const s = jaccard(contentSet(arr[i]), contentSet(arr[j]));
+      if(s>=0.6){
+        sims[arr[i].id].push({name:arr[j].defendant||'(chưa đặt tên)', pct:Math.round(s*100)});
+        sims[arr[j].id].push({name:arr[i].defendant||'(chưa đặt tên)', pct:Math.round(s*100)});
+      }
+    }
+  }
+
+  filtered.forEach(c=>{
+    const tr = document.createElement('tr');
+    const rowCount = (c.rows||[]).length;
+    const total = computeToSo(JSON.parse(JSON.stringify(c.rows||[])));
+    const simBadges = (sims[c.id]||[]).map(s=>`<span class="badge similar">≈${s.pct}% ${escapeHtml(s.name)}</span>`).join('');
+    tr.innerHTML = `
+      <td><input type="checkbox" class="case-check" data-id="${c.id}"></td>
+      <td class="name-cell">${escapeHtml(c.defendant||'(chưa đặt tên)')}</td>
+      <td>${c.dateStr?formatVNDate(c.dateStr):'-'}</td>
+      <td><span class="badge count">${rowCount} dòng</span></td>
+      <td>${total} tờ</td>
+      <td>${simBadges || '<span class="small-note">-</span>'}</td>
+      <td>
+        <div class="row-actions">
+          <button class="ghost" data-act="edit" data-id="${c.id}">Sửa</button>
+          <button class="ghost" data-act="dup" data-id="${c.id}">Nhân bản</button>
+          <button class="ghost danger" data-act="del" data-id="${c.id}">Xóa</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  updateToolbarState();
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function formatVNDate(iso){
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  return `Ngày ${d.getDate()} tháng ${d.getMonth()+1} năm ${d.getFullYear()}`;
+}
+
+function updateToolbarState(){
+  const checked = document.querySelectorAll('.case-check:checked');
+  document.getElementById('btn-batch-print').disabled = checked.length===0;
+  document.getElementById('btn-compare').disabled = checked.length!==2;
+  document.getElementById('btn-preview-selected').disabled = checked.length===0;
+  document.getElementById('btn-export-selected').disabled = checked.length===0;
+}
+
+document.querySelector('#table-cases tbody').addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button');
+  if(!btn) return;
+  const id = btn.dataset.id;
+  const act = btn.dataset.act;
+  if(act==='edit'){ openEditor(id); }
+  else if(act==='dup'){
+    const orig = cases[id];
+    const copy = JSON.parse(JSON.stringify(orig));
+    copy.id = uid();
+    copy.defendant = (orig.defendant||'')+' (bản sao)';
+    copy.updatedAt = Date.now();
+    await saveCase(copy);
+    renderCaseList();
+  } else if(act==='del'){
+    const ok = await showConfirm('Xóa hồ sơ "'+(cases[id].defendant||'')+'"? Không thể hoàn tác.');
+    if(ok){
+      await deleteCaseStorage(id);
+      renderCaseList();
+    }
+  }
+});
+document.querySelector('#table-cases tbody').addEventListener('change', (e)=>{
+  if(e.target.classList.contains('case-check')) updateToolbarState();
+});
+document.getElementById('check-all').addEventListener('change', (e)=>{
+  document.querySelectorAll('.case-check').forEach(cb=>cb.checked=e.target.checked);
+  updateToolbarState();
+});
+document.getElementById('search-cases').addEventListener('input', renderCaseList);
+
+function openEditor(id){
+  currentCaseId = id || null;
+  const c = id ? cases[id] : {id:uid(), defendant:'', dateStr:new Date().toISOString().slice(0,10), preparer:'', agency:'', rows:[]};
+  currentRows = JSON.parse(JSON.stringify(c.rows||[]));
+  document.getElementById('f-defendant').value = c.defendant||'';
+  document.getElementById('f-date').value = c.dateStr||new Date().toISOString().slice(0,10);
+  document.getElementById('f-preparer').value = c.preparer||'';
+  document.getElementById('f-agency').value = c.agency||'';
+  currentCaseId = c.id;
+  renderRows();
+  document.getElementById('view-list').classList.add('hidden');
+  document.getElementById('view-editor').classList.remove('hidden');
+}
+
+document.getElementById('btn-new-case').addEventListener('click', ()=> openEditor(null));
+document.getElementById('btn-back').addEventListener('click', ()=>{
+  document.getElementById('view-editor').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+});
+
+function renderRows(){
+  const tbody = document.getElementById('rows-body');
+  tbody.innerHTML='';
+  const total = computeToSo(currentRows);
+  currentRows.forEach((row,idx)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="stt-cell">${String(idx+1).padStart(2,'0')}</td>
+      <td class="txt"><textarea data-idx="${idx}" data-field="content" rows="1">${escapeHtml(row.content||'')}</textarea></td>
+      <td><input type="number" min="1" class="count-input" data-idx="${idx}" data-field="pageCount" value="${row.customToSo? '' : (row.pageCount||1)}" ${row.customToSo?'disabled':''}></td>
+      <td class="toso-cell">
+        <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+          <span>${row.toSoText||''}</span>
+          <label style="font-size:10px;color:var(--ink-soft);display:flex;gap:3px;align-items:center;">
+            <input type="checkbox" data-idx="${idx}" data-field="customToSo" ${row.customToSo?'checked':''}> tự nhập
+          </label>
+          ${row.customToSo?`<input type="text" data-idx="${idx}" data-field="toSoTextManual" value="${escapeHtml(row.toSoText||'')}" style="width:70px;font-size:11px;padding:3px;">`:''}
+        </div>
+      </td>
+      <td class="txt"><textarea data-idx="${idx}" data-field="note" rows="1">${escapeHtml(row.note||'')}</textarea></td>
+      <td>
+        <div class="row-actions">
+          <button title="Chèn dòng bên dưới" data-idx="${idx}" data-act="insert">+</button>
+          <button title="Lên" data-idx="${idx}" data-act="up">&uarr;</button>
+          <button title="Xuống" data-idx="${idx}" data-act="down">&darr;</button>
+          <button title="Xóa" class="danger" data-idx="${idx}" data-act="del">&times;</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('total-pages').textContent = total;
+  document.getElementById('total-rows').textContent = currentRows.length;
+}
+
+document.getElementById('rows-body').addEventListener('input', (e)=>{
+  const idx = e.target.dataset.idx;
+  const field = e.target.dataset.field;
+  if(idx===undefined || !field) return;
+  const row = currentRows[idx];
+  if(field==='content') row.content = e.target.value;
+  else if(field==='note') row.note = e.target.value;
+  else if(field==='pageCount'){ row.pageCount = parseInt(e.target.value,10)||1; renderRows(); }
+  else if(field==='toSoTextManual'){ row.toSoText = e.target.value; }
+});
+document.getElementById('rows-body').addEventListener('change', (e)=>{
+  const idx = e.target.dataset.idx;
+  if(e.target.dataset.field==='customToSo'){
+    currentRows[idx].customToSo = e.target.checked;
+    if(!e.target.checked) currentRows[idx].toSoText='';
+    renderRows();
+  }
+});
+document.getElementById('rows-body').addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button[data-act]');
+  if(!btn) return;
+  const idx = parseInt(btn.dataset.idx,10);
+  const act = btn.dataset.act;
+  if(act==='up' && idx>0){ [currentRows[idx-1],currentRows[idx]]=[currentRows[idx],currentRows[idx-1]]; renderRows(); }
+  else if(act==='down' && idx<currentRows.length-1){ [currentRows[idx+1],currentRows[idx]]=[currentRows[idx],currentRows[idx+1]]; renderRows(); }
+  else if(act==='insert'){
+    currentRows.splice(idx+1, 0, {content:'', pageCount:1, note:'', customToSo:false, toSoText:''});
+    renderRows();
+    const nextArea = document.querySelector(`textarea[data-idx="${idx+1}"][data-field="content"]`);
+    if(nextArea) nextArea.focus();
+  }
+  else if(act==='del'){
+    const ok = await showConfirm('Xóa dòng này?');
+    if(ok){ currentRows.splice(idx,1); renderRows(); }
+  }
+});
+
+document.getElementById('btn-add-custom').addEventListener('click', ()=>{
+  currentRows.push({content:'', pageCount:1, note:'', customToSo:false, toSoText:''});
+  renderRows();
+});
+
+document.getElementById('btn-save-case').addEventListener('click', async ()=>{
+  const defendant = document.getElementById('f-defendant').value.trim();
+  if(!defendant){ showToast('Vui lòng nhập tên bị can / vụ án.'); return; }
+  computeToSo(currentRows);
+  const obj = {
+    id: currentCaseId,
+    defendant,
+    dateStr: document.getElementById('f-date').value,
+    preparer: document.getElementById('f-preparer').value.trim(),
+    agency: document.getElementById('f-agency').value.trim(),
+    rows: currentRows,
+    updatedAt: Date.now()
+  };
+  await saveCase(obj);
+  document.getElementById('view-editor').classList.add('hidden');
+  document.getElementById('view-list').classList.remove('hidden');
+  renderCaseList();
+});
+
+function buildPicker(){
+  const body = document.getElementById('picker-body');
+  body.innerHTML='';
+  const q = document.getElementById('picker-search').value.trim().toLowerCase();
+  const allCats = CATALOG.concat(customCatalog.length? [["Mục tự thêm", customCatalog]]:[]);
+  allCats.forEach(([cat, items])=>{
+    const filteredItems = items.filter(it=> !q || it.toLowerCase().includes(q));
+    if(filteredItems.length===0) return;
+    const isCustom = cat==='Mục tự thêm';
+    const block = document.createElement('div');
+    block.className='cat-block';
+    const title = document.createElement('div');
+    title.className='cat-title';
+    title.textContent = cat;
+    block.appendChild(title);
+    filteredItems.forEach(it=>{
+      const line = document.createElement('label');
+      line.className='item-line';
+      line.style.justifyContent='space-between';
+      const checked = pickerSelection.has(it) ? 'checked' : '';
+      const removeBtn = isCustom ? `<button type="button" class="ghost danger" data-remove-custom="${escapeHtml(it)}" style="font-size:10px;padding:1px 6px;flex:none;">xóa</button>` : '';
+      line.innerHTML = `<span style="display:flex;gap:8px;align-items:flex-start;flex:1;"><input type="checkbox" value="${escapeHtml(it)}" ${checked}><span>${escapeHtml(it)}</span></span>${removeBtn}`;
+      block.appendChild(line);
+    });
+    body.appendChild(block);
+  });
+}
+document.getElementById('picker-body').addEventListener('change', (e)=>{
+  if(e.target.type==='checkbox'){
+    const v = e.target.value;
+    if(e.target.checked) pickerSelection.add(v); else pickerSelection.delete(v);
+  }
+});
+document.getElementById('picker-body').addEventListener('click', async (e)=>{
+  const btn = e.target.closest('button[data-remove-custom]');
+  if(!btn) return;
+  const val = btn.dataset.removeCustom;
+  const ok = await showConfirm('Xóa mục "'+val+'" khỏi danh mục tự thêm?');
+  if(ok){
+    customCatalog = customCatalog.filter(x=>x!==val);
+    pickerSelection.delete(val);
+    await saveCustomCatalog();
+    buildPicker();
+    showToast('Đã xóa khỏi danh mục tự thêm.');
+  }
+});
+document.getElementById('btn-clean-duplicates').addEventListener('click', async ()=>{
+  const builtIn = new Set();
+  CATALOG.forEach(([,items])=> items.forEach(it=>builtIn.add(it)));
+  const before = customCatalog.length;
+  customCatalog = customCatalog.filter(it=> !builtIn.has(it));
+  const removed = before - customCatalog.length;
+  await saveCustomCatalog();
+  buildPicker();
+  showToast(removed>0 ? `Đã xóa ${removed} mục trùng với danh mục chuẩn.` : 'Không có mục nào trùng.');
+});
+document.getElementById('btn-clear-custom').addEventListener('click', async ()=>{
+  if(customCatalog.length===0){ showToast('Danh mục tự thêm đang trống.'); return; }
+  const ok = await showConfirm('Xóa toàn bộ '+customCatalog.length+' mục tự thêm? Không thể hoàn tác.');
+  if(ok){
+    customCatalog = [];
+    await saveCustomCatalog();
+    buildPicker();
+    showToast('Đã xóa toàn bộ danh mục tự thêm.');
+  }
+});
+document.getElementById('picker-search').addEventListener('input', buildPicker);
+
+document.getElementById('btn-add-item').addEventListener('click', ()=>{
+  pickerSelection = new Set();
+  document.getElementById('picker-search').value='';
+  document.getElementById('custom-item-input').value='';
+  document.getElementById('merge-toggle').checked=false;
+  buildPicker();
+  document.getElementById('picker-overlay').classList.remove('hidden');
+});
+document.getElementById('picker-cancel').addEventListener('click', ()=> document.getElementById('picker-overlay').classList.add('hidden'));
+document.getElementById('btn-add-to-catalog').addEventListener('click', async ()=>{
+  const v = document.getElementById('custom-item-input').value.trim();
+  if(!v) return;
+  if(!customCatalog.includes(v)) customCatalog.push(v);
+  await saveCustomCatalog();
+  document.getElementById('custom-item-input').value='';
+  buildPicker();
+});
+document.getElementById('picker-confirm').addEventListener('click', ()=>{
+  const items = Array.from(pickerSelection);
+  if(items.length===0){ document.getElementById('picker-overlay').classList.add('hidden'); return; }
+  const merge = document.getElementById('merge-toggle').checked;
+  if(merge){
+    currentRows.push({content: items.join('; '), pageCount: items.length, note:'', customToSo:false, toSoText:''});
+  } else {
+    items.forEach(it=> currentRows.push({content: it, pageCount:1, note:'', customToSo:false, toSoText:''}));
+  }
+  renderRows();
+  document.getElementById('picker-overlay').classList.add('hidden');
+});
+
+document.getElementById('btn-print-one').addEventListener('click', ()=>{
+  computeToSo(currentRows);
+  const obj = {
+    defendant: document.getElementById('f-defendant').value.trim() || '(chưa đặt tên)',
+    dateStr: document.getElementById('f-date').value,
+    preparer: document.getElementById('f-preparer').value.trim(),
+    agency: document.getElementById('f-agency').value.trim(),
+    rows: currentRows
+  };
+  printCases([obj]);
+});
+document.getElementById('btn-batch-print').addEventListener('click', ()=>{
+  const ids = Array.from(document.querySelectorAll('.case-check:checked')).map(cb=>cb.dataset.id);
+  const objs = ids.map(id=>cases[id]).filter(Boolean);
+  printCases(objs);
+});
+
+function buildPrintHtml(list){
+  let body='';
+  list.forEach(c=>{
+    const rows = JSON.parse(JSON.stringify(c.rows||[]));
+    const total = computeToSo(rows);
+    let rowsHtml='';
+    rows.forEach((r,i)=>{
+      rowsHtml += `<tr>
+        <td>${String(i+1).padStart(2,'0')}</td>
+        <td></td><td></td>
+        <td style="text-align:left;">${escapeHtml(r.content||'')}</td>
+        <td></td>
+        <td>${escapeHtml(r.toSoText||'')}</td>
+        <td>${escapeHtml(r.note||'')}</td>
+      </tr>`;
+    });
+    body += `
+      <div class="print-case">
+        <h2>MỤC LỤC TÀI LIỆU VĂN KIỆN</h2>
+        <p style="text-align:center;margin:-8px 0 12px;font-size:12px;">${escapeHtml(c.defendant||'')}</p>
+        <table>
+          <thead><tr>
+            <th>Số thứ tự</th><th>Số và ký hiệu văn kiện</th><th>Ngày tháng văn kiện</th>
+            <th>Tên, loại và trích yếu văn kiện</th><th>Cơ quan lập văn kiện</th><th>Tờ số</th><th>Ghi chú</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        <div class="print-foot">
+          <p><b>CHỨNG TỪ KẾT THÚC</b></p>
+          <p>Trong hồ sơ này có: ${total} tờ.</p>
+          <p style="text-align:right;">${c.dateStr?formatVNDate(c.dateStr):''}</p>
+          <p class="sig" style="text-align:right;">Người lập hồ sơ<br><br><br>${escapeHtml(c.preparer||'')}</p>
+        </div>
+      </div>`;
+  });
+  return `<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>In hồ sơ</title>
+  <style>
+    body{font-family:"Times New Roman",serif;color:#000;margin:0;}
+    .print-case{page-break-after:always;padding:24px 32px;}
+    .print-case:last-child{page-break-after:auto;}
+    .print-case h2{text-align:center;font-size:16px;letter-spacing:1px;margin:4px 0 10px;}
+    table{width:100%;border-collapse:collapse;font-size:12.5px;}
+    th,td{border:1px solid #000;padding:5px 7px;}
+    thead th{font-weight:700;text-align:center;}
+    .print-foot{margin-top:18px;font-size:13.5px;}
+    .print-foot .sig{text-align:right;margin-top:6px;font-weight:700;}
+    @media print{ body{margin:0;} }
+  </style></head><body>${body}</body></html>`;
+}
+
+function printCases(list){
+  if(!list || list.length===0){ showToast('Không có hồ sơ nào để in.'); return; }
+  const root = document.getElementById('print-root');
+  let body='';
+  list.forEach(c=>{
+    const rows = JSON.parse(JSON.stringify(c.rows||[]));
+    const total = computeToSo(rows);
+    let rowsHtml='';
+    rows.forEach((r,i)=>{
+      rowsHtml += `<tr>
+        <td>${String(i+1).padStart(2,'0')}</td>
+        <td></td><td></td>
+        <td style="text-align:left;">${escapeHtml(r.content||'')}</td>
+        <td></td>
+        <td>${escapeHtml(r.toSoText||'')}</td>
+        <td>${escapeHtml(r.note||'')}</td>
+      </tr>`;
+    });
+    body += `
+      <div class="print-case">
+        <h2>MỤC LỤC TÀI LIỆU VĂN KIỆN</h2>
+        <p style="text-align:center;margin:-8px 0 12px;font-size:12px;">${escapeHtml(c.defendant||'')}</p>
+        <table>
+          <thead><tr>
+            <th>Số thứ tự</th><th>Số và ký hiệu văn kiện</th><th>Ngày tháng văn kiện</th>
+            <th>Tên, loại và trích yếu văn kiện</th><th>Cơ quan lập văn kiện</th><th>Tờ số</th><th>Ghi chú</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        <div class="print-foot">
+          <p><b>CHỨNG TỪ KẾT THÚC</b></p>
+          <p>Trong hồ sơ này có: ${total} tờ.</p>
+          <p style="text-align:right;">${c.dateStr?formatVNDate(c.dateStr):''}</p>
+          <p class="sig" style="text-align:right;">Người lập hồ sơ<br><br><br>${escapeHtml(c.preparer||'')}</p>
+        </div>
+      </div>`;
+  });
+  root.innerHTML = body;
+  showToast('Nếu hộp thoại in không tự hiện ra, hãy nhấn Ctrl+P (Cmd+P trên Mac) để in, hoặc dùng nút "Xuất file (.doc)" rồi in từ Word.');
+  setTimeout(()=>{ try{ window.print(); }catch(e){} }, 200);
+}
+
+function sanitizeFilename(s){
+  return (s||'ho-so').normalize('NFC').replace(/[\\/:*?"<>|]/g,'').trim().replace(/\s+/g,'_');
+}
+
+function buildWordDocument(list){
+  let body='';
+  list.forEach((c,idx)=>{
+    const rows = JSON.parse(JSON.stringify(c.rows||[]));
+    const total = computeToSo(rows);
+    let rowsHtml='';
+    rows.forEach((r,i)=>{
+      rowsHtml += `<tr>
+        <td style="text-align:center;">${String(i+1).padStart(2,'0')}</td>
+        <td>&nbsp;</td><td>&nbsp;</td>
+        <td style="text-align:left;">${escapeHtml(r.content||'')}</td>
+        <td>&nbsp;</td>
+        <td style="text-align:center;">${escapeHtml(r.toSoText||'')}</td>
+        <td>${escapeHtml(r.note||'')}&nbsp;</td>
+      </tr>`;
+    });
+    body += `
+      <div style="${idx>0?'page-break-before:always;':''}font-family:'Times New Roman',serif;font-size:13pt;">
+        <h2 style="text-align:center;font-size:15pt;letter-spacing:1px;">MỤC LỤC TÀI LIỆU VĂN KIỆN</h2>
+        <p style="text-align:center;font-size:12pt;margin-top:-8px;">${escapeHtml(c.defendant||'')}</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12pt;" border="1" cellspacing="0" cellpadding="4">
+          <thead><tr>
+            <th>Số thứ tự</th><th>Số và ký hiệu văn kiện</th><th>Ngày tháng văn kiện</th>
+            <th>Tên, loại và trích yếu văn kiện</th><th>Cơ quan lập văn kiện</th><th>Tờ số</th><th>Ghi chú</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+        <p style="margin-top:16pt;"><b>CHỨNG TỪ KẾT THÚC</b></p>
+        <p>Trong hồ sơ này có: ${total} tờ.</p>
+        <p style="text-align:right;">${c.dateStr?formatVNDate(c.dateStr):''}</p>
+        <p style="text-align:right;font-weight:bold;">Người lập hồ sơ<br><br><br>${escapeHtml(c.preparer||'')}</p>
+      </div>`;
+  });
+  return `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head><meta charset='utf-8'><title>Xuất hồ sơ</title>
+  <!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->
+  </head><body>${body}</body></html>`;
+}
+
+function exportWordDoc(list){
+  if(!list || list.length===0){ showToast('Không có hồ sơ nào để xuất.'); return; }
+  const html = buildWordDocument(list);
+  const blob = new Blob(['\ufeff', html], {type:'application/msword'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const name = list.length===1 ? sanitizeFilename(list[0].defendant) : ('ho-so-hang-loat-'+new Date().toISOString().slice(0,10));
+  a.href = url; a.download = name+'.doc';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+let previewList = [];
+function previewCases(list){
+  if(!list || list.length===0){ showToast('Chưa có hồ sơ nào để xem trước.'); return; }
+  previewList = list;
+  const rowsHtmlAll = list.map(c=>{
+    const rows = JSON.parse(JSON.stringify(c.rows||[]));
+    const total = computeToSo(rows);
+    let rowsHtml='';
+    rows.forEach((r,i)=>{
+      rowsHtml += `<tr>
+        <td style="text-align:center;border:1px solid #8a8368;padding:4px 6px;">${String(i+1).padStart(2,'0')}</td>
+        <td style="border:1px solid #8a8368;padding:4px 6px;"></td>
+        <td style="border:1px solid #8a8368;padding:4px 6px;"></td>
+        <td style="text-align:left;border:1px solid #8a8368;padding:4px 6px;">${escapeHtml(r.content||'')}</td>
+        <td style="border:1px solid #8a8368;padding:4px 6px;"></td>
+        <td style="text-align:center;border:1px solid #8a8368;padding:4px 6px;">${escapeHtml(r.toSoText||'')}</td>
+        <td style="border:1px solid #8a8368;padding:4px 6px;">${escapeHtml(r.note||'')}</td>
+      </tr>`;
+    });
+    return `<div style="font-family:'Times New Roman',serif;margin-bottom:26px;padding-bottom:18px;border-bottom:2px dashed #ccc;">
+      <h2 style="text-align:center;font-size:16px;letter-spacing:1px;">MỤC LỤC TÀI LIỆU VĂN KIỆN</h2>
+      <p style="text-align:center;font-size:13px;margin-top:-6px;">${escapeHtml(c.defendant||'(chưa đặt tên)')}</p>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+        <thead><tr>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Số thứ tự</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Số và ký hiệu văn kiện</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Ngày tháng văn kiện</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Tên, loại và trích yếu văn kiện</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Cơ quan lập văn kiện</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Tờ số</th>
+          <th style="border:1px solid #8a8368;padding:5px;background:#efe9d5;">Ghi chú</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+      <p style="margin-top:14px;font-size:13px;"><b>CHỨNG TỪ KẾT THÚC</b></p>
+      <p style="font-size:13px;">Trong hồ sơ này có: ${total} tờ.</p>
+      <p style="text-align:right;font-size:13px;">${c.dateStr?formatVNDate(c.dateStr):''}</p>
+      <p style="text-align:right;font-weight:bold;font-size:13px;">Người lập hồ sơ<br><br><br>${escapeHtml(c.preparer||'')}</p>
+    </div>`;
+  }).join('');
+  document.getElementById('preview-content').innerHTML = rowsHtmlAll;
+  document.getElementById('preview-overlay').classList.remove('hidden');
+}
+
+document.getElementById('btn-preview-selected').addEventListener('click', ()=>{
+  const ids = Array.from(document.querySelectorAll('.case-check:checked')).map(cb=>cb.dataset.id);
+  previewCases(ids.map(id=>cases[id]).filter(Boolean));
+});
+document.getElementById('btn-export-selected').addEventListener('click', ()=>{
+  const ids = Array.from(document.querySelectorAll('.case-check:checked')).map(cb=>cb.dataset.id);
+  exportWordDoc(ids.map(id=>cases[id]).filter(Boolean));
+});
+document.getElementById('btn-preview-one').addEventListener('click', ()=>{
+  computeToSo(currentRows);
+  previewCases([{
+    defendant: document.getElementById('f-defendant').value.trim() || '(chưa đặt tên)',
+    dateStr: document.getElementById('f-date').value,
+    preparer: document.getElementById('f-preparer').value.trim(),
+    agency: document.getElementById('f-agency').value.trim(),
+    rows: currentRows
+  }]);
+});
+document.getElementById('btn-export-one').addEventListener('click', ()=>{
+  computeToSo(currentRows);
+  exportWordDoc([{
+    defendant: document.getElementById('f-defendant').value.trim() || '(chưa đặt tên)',
+    dateStr: document.getElementById('f-date').value,
+    preparer: document.getElementById('f-preparer').value.trim(),
+    agency: document.getElementById('f-agency').value.trim(),
+    rows: currentRows
+  }]);
+});
+document.getElementById('preview-close').addEventListener('click', ()=> document.getElementById('preview-overlay').classList.add('hidden'));
+document.getElementById('preview-export-doc').addEventListener('click', ()=> exportWordDoc(previewList));
+document.getElementById('preview-print').addEventListener('click', ()=> printCases(previewList));
+
+document.getElementById('btn-compare').addEventListener('click', ()=>{
+  const ids = Array.from(document.querySelectorAll('.case-check:checked')).map(cb=>cb.dataset.id);
+  if(ids.length!==2) return;
+  const [a,b] = ids.map(id=>cases[id]);
+  renderCompare(a,b);
+  document.getElementById('compare-overlay').classList.remove('hidden');
+});
+document.getElementById('compare-close').addEventListener('click', ()=> document.getElementById('compare-overlay').classList.add('hidden'));
+
+function renderCompare(a,b){
+  const setA = contentSet(a), setB = contentSet(b);
+  const body = document.getElementById('compare-body');
+  function colHtml(name, rows, otherSet){
+    let html = `<div class="compare-col"><h3>${escapeHtml(name)}</h3><table class="list">`;
+    (rows||[]).forEach(r=>{
+      const parts = (r.content||'').split(';').map(s=>s.trim()).filter(Boolean);
+      const allMatch = parts.length>0 && parts.every(p=> otherSet.has(p.toLowerCase()));
+      html += `<tr class="${allMatch?'match-yes':'match-no'}"><td style="font-size:12px;padding:4px 6px;">${escapeHtml(r.content||'')}</td></tr>`;
+    });
+    html += '</table></div>';
+    return html;
+  }
+  const sim = Math.round(jaccard(setA,setB)*100);
+  body.innerHTML = `<div style="grid-column:1/-1;margin-bottom:6px;font-size:13px;">Độ giống nhau: <b>${sim}%</b></div>`
+    + colHtml(a.defendant||'(chưa đặt tên)', a.rows, setB)
+    + colHtml(b.defendant||'(chưa đặt tên)', b.rows, setA);
+}
+
+document.getElementById('btn-export').addEventListener('click', exportAllData);
+document.getElementById('btn-import').addEventListener('click', ()=> document.getElementById('import-file-input').click());
+document.getElementById('import-file-input').addEventListener('change', (e)=>{
+  const f = e.target.files[0];
+  if(f) importAllData(f);
+  e.target.value='';
+});
+
+async function init(){
+  await loadCustomCatalog();
+  await loadAllCases();
+  renderCaseList();
+}
+init();
+</script>
+</body>
+</html>
